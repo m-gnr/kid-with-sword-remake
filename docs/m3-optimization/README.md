@@ -19,6 +19,10 @@ Phase One observed 21.62 FPS, a 46.25 ms frame interval, 36.29 ms of reported GP
 - [x] Identify the native-store backport and verify the local shader.
 - [ ] Obtain approval before substantial renderer changes or a full game rebuild.
 
+## Phase Three status
+
+The [Phase Three technical report](08-phase-three-technical-report.md) records the base M4 investigation and the order of follow-up tests. A base M4 / 24 GB report reached 39.5 FPS outdoors and 45.2 FPS indoors in Handheld mode. No matched 20 → 40–45 FPS comparison or new base M3 performance result was verified.
+
 ## Technical record
 
 - [Baseline](01-baseline.md)
@@ -27,5 +31,7 @@ Phase One observed 21.62 FPS, a 46.25 ms frame interval, 36.29 ms of reported GP
 - [Benchmark protocol and results](04-benchmarks.md)
 - [Engineering changelog](05-changelog.md)
 - [Known issues](06-known-issues.md)
+- [Base M4 community evidence and fork comparison](07-base-m4-investigation.md)
+- [Phase Three technical report](08-phase-three-technical-report.md)
 
 Keep game inputs, saves, generated shaders, captures and raw logs outside Git. Put new game-specific findings in the [game note](../../dm/games/0400486024DEC000/README.md) and link them from this project record.
