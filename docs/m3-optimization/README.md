@@ -28,6 +28,15 @@ The existing base M3 measurements used Normal + Docked. Phase One observed 21.62
 
 The [Phase Three technical report](08-phase-three-technical-report.md) records the base M4 investigation and the order of follow-up tests. A base M4 / 24 GB report reached 39.5 FPS outdoors and 45.2 FPS indoors in Handheld mode. No matched 20 → 40–45 FPS comparison or new base M3 performance result was verified.
 
+## Phase Four status
+
+- [x] Reconcile targeted upstream PRs (#1455, #1447, #1394, #1439, #1489, #1590, #1663) and commits (`ffebfd59`, `e5f1adee`) against local fork.
+- [x] Verify that PRs #1455, #1447, #1394, and #1439 are already fully implemented in local commit `ad998585`.
+- [x] Establish that host-only optimizations (PR #1590 archive/lookahead, PR #1489 notes) require zero shader rebuilds and reuse existing 42,854-entry libraries.
+- [x] Establish that native subword stores (`ffebfd59`) affect only 515 shaders and leverage `cas.db` to avoid full recompilation.
+- [x] Rank candidate optimizations for Normal + Handheld performance (minimum 40 FPS, target 60 FPS) and identify the top three candidates.
+- [x] Recommend the smallest independently verifiable first optimization (host-only PSO archive epoch separation from PR #1590) in the [Phase Four technical report](09-phase-four-upstream-research.md).
+
 ## Technical record
 
 - [Baseline](01-baseline.md)
@@ -38,5 +47,6 @@ The [Phase Three technical report](08-phase-three-technical-report.md) records t
 - [Known issues](06-known-issues.md)
 - [Base M4 community evidence and fork comparison](07-base-m4-investigation.md)
 - [Phase Three technical report](08-phase-three-technical-report.md)
+- [Phase Four upstream research and integration planning](09-phase-four-upstream-research.md)
 
 Keep game inputs, saves, generated shaders, captures and raw logs outside Git. Put new game-specific findings in the [game note](../../dm/games/0400486024DEC000/README.md) and link them from this project record.
