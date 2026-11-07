@@ -41,3 +41,9 @@ Trace `fstep_tick` in [hle_nvn.c](../../dm/gfx/nvn/hle_nvn.c) and `link_sync`, `
 The game rendered the main 3D passes at 854 × 480, produced 2560 × 1440 and presented through MetalFX to 3600 × 2025. `DM_NVN_UPDUMP` reproduced the unrecognized `d99fbeeb53d38847` stage at 854 × 480 → 2560 × 1440. The fallback left the game NDSR chain active in the sampled frames. The host separately reported 2.48 ms p50 and 3.09 ms p95 on the last 600 presentation MetalFX command buffers. These timings can overlap with game rendering.
 
 The diagnostic window recorded zero re-uploads and zero synchronous pipeline creations. Sampled peaks were 10,507 MiB physical footprint and 7,182 MiB Metal allocation. System swap continued to move. Those counters constrain the investigation for this view. A separate matched scene-transition run is needed to assess upload and release behavior.
+
+### Serialized compute and same-frame attribution
+
+A separate `compute-1` run enabled `DM_NVN_GPUPROF_CS=1`. In warmed frames 3600, 3840 and 4080, the four NDSR dispatches summed to 3.52–4.28 ms. The terminal shader `d99fbeeb53d38847` alone took 3.30–4.06 ms. In frame 3600 the next largest keys were `9e6b00b050e30801` at 1.04 ms and `9ed48d1011f1b48b` at 0.57 ms, both from `AglShader.sharcb`. These timings serialize dispatches and are useful for shader attribution only.
+
+Frame 3360 additionally had an all-bindings pass dump. Its largest color/depth pass (101462, 854 × 480, 1,073 draws) bound eleven foliage mesh shaders, including `17c8ab6419068d4b`, `73dc0b90c4082e43` and `eed1add7c89f5d34`. Read-only archive inspection confirmed threadgroup CAS in all eleven. The dump did not contain the initial Phase One key `626fbf48041cb82b`. The per-pass cost includes other geometry and shading. There is no per-draw estimate of the native-store benefit.

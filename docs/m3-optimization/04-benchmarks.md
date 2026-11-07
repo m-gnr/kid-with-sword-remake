@@ -52,3 +52,9 @@ Phase Two calibration used game version v131072, chain `dc815e0f38ca`, input sta
 | `profile-2` | 2026-11-07 / `e9c2f7e1` source baseline | 45.019 s | 20.32 / 12.90 | 49.90/51.63/52.77 ms | 35.31/37.94/41.89 ms | 10,507 MiB footprint, 7,182 MiB Metal sampled peaks. 915 distinct presents, 22 discarded, swap-in/out deltas 9,107/12,196 system pages. Stationary forest view. Diagnostic instrumentation excludes this run from ordinary A/B. |
 
 Both runs used the base M3, 16 GiB, macOS 26.6.2 and the verified host artifact above. Settings were Docked, Normal, fullscreen, 60 FPS target, Game Mode off and dispatch overlap off. `profile-1` stopped in the title after the local reader encountered a partial TSV line. The retry ignored incomplete lines and used a manual confirm in the same copied save.
+
+### GPU diagnostic artifacts
+
+- `compute-1/log.txt` contains the separately serialized compute samples, a same-frame all-bindings pass dump and shader attribution in [Investigation](02-investigation.md#serialized-compute-and-same-frame-attribution).
+- `capture-1/captures/dm_20261107-191459_f3330.gputrace` is the Xcode Metal frame capture from the copied save. The host logged the start and stop, then exited cleanly after the trace write window. The package occupies 7.7 GiB on the external APFS volume. The capture path compiled pipelines through `MTLDevice` and took about 165 s to prewarm. Keep its timings separate. Per-draw analysis in Xcode is pending.
+- The first `Metal System Trace` attempt in `compute-1` reached the 10 s time limit but timed out during finalization. `xctrace export --toc` rejected its partial bundle with `Document Missing Template Error`. A retry is planned outside the last ordinary timing window.

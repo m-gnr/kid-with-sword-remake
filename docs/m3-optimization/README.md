@@ -12,6 +12,7 @@ Phase One observed 21.62 FPS, a 46.25 ms frame interval, 36.29 ms of reported GP
 - [x] Preserve the Phase One measurements and the five investigation areas.
 - [x] Verify an isolated launch with a copied Kokiri Forest save and fixed camera.
 - [x] Collect and rank a separate base-M3 per-pass profile.
+- [x] Attribute the NDSR compute workload and save an Xcode Metal frame capture.
 - [ ] Complete three ordinary baselines and three dispatch-overlap runs.
 - [ ] Rank candidate changes from base-M3 evidence and select the first implementation.
 - [x] Identify the native-store backport and verify the local shader.
