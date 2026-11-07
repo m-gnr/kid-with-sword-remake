@@ -1,5 +1,7 @@
 # Optimization plan
 
+On base M3 (16 GB), **P0 is stable 60 presented FPS in Normal + Handheld (1280 × 720)**. **P1 is stable 60 presented FPS in Normal + Docked, if feasible**. Preserve visual quality and normal gameplay speed in both modes. Do not use Potato settings.
+
 Dispatch overlap is the first candidate for route validation. It consistently shortened the tagged GPU span on base M3 and is reversible at launch. Foliage is the first code backport to assess, contingent on per-draw evidence from the captured frame. See the [controlled results](04-benchmarks.md#ordinary-dispatch-overlap-ab).
 
 | Candidate | Expected benefit and evidence | Dependencies and effort | Correctness checks and status |
@@ -20,8 +22,8 @@ A settings-only comparison uses the current executable and archives. A chain cha
 
 ## Next validation
 
-The [Phase Three report](08-phase-three-technical-report.md#order-of-work-and-backport-gates) prioritizes the next runtime comparisons and puts gates on the minimal backports in light of the base M4 evidence.
+The [Phase Three report](08-phase-three-technical-report.md#order-of-work-and-backport-gates) prioritizes the next runtime comparisons and puts gates on the minimal backports in light of the base M4 evidence. Use P0 for the next runtime comparisons and evaluate P1 separately if feasible.
 
-1. Repeat the overlap comparison on a fixed route with a camera turn, a reload and an area boundary. Keep both scaling selections and the 60 FPS target fixed. Check motion and draw ordering, texture views, scene-entry stalls and game time against wall time.
+1. Establish a P0 baseline and compare dispatch overlap on a fixed route with a camera turn, a reload and an area boundary. Keep both scaling selections and the 60 FPS target fixed. Check motion and draw ordering, texture views, scene-entry stalls and game time against wall time.
 2. Open the frame capture in Xcode and attribute the 854 × 480 hot pass by draw and mesh program. If the CAS-heavy draws warrant a backport, request approval for the isolated source and shader/host build. Validate primitive count and indices, threadgroup ordering, both depth conventions and the matching visual route before estimating savings.
 3. Run independent scaling diagnostics at matched input, game output and drawable sizes. For the game stage, establish that the replacement handles the observed terminal variant through the whole frame. For presentation, compare MetalFX and bilinear on matched screenshots and retain the image-quality decision for review. Test allocation and release policies separately using area transitions and upload/residency counters.

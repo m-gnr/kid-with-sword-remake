@@ -1,6 +1,6 @@
 # Base M4 community performance investigation
 
-Evidence reviewed through 2026-11-07 for the Switch 2 remake (title ID `0400486024DEC000`). The primary repository is [seedds/nxnative](https://github.com/seedds/nxnative). Public reports substantiate **39.5–41.6 FPS on specific outdoor routes and 44.9–45.2 FPS inside Link's house on base M4 / 24 GB**. The closest earlier run on the same reporter's hardware and save was **34.7 FPS inside the house**. No public result reviewed establishes a matched 20 → 40–45 FPS jump, sustained 60 FPS in Kokiri Village on base M4, or the corresponding gain at our Docked target. This was a source and evidence review; no new game run was made.
+Evidence reviewed through 2026-11-07 for the Switch 2 remake (title ID `0400486024DEC000`). The primary repository is [seedds/nxnative](https://github.com/seedds/nxnative). Public reports substantiate **39.5–41.6 FPS on specific outdoor routes and 44.9–45.2 FPS inside Link's house on base M4 / 24 GB**. The closest earlier run on the same reporter's hardware and save was **34.7 FPS inside the house**. No public result reviewed establishes a matched 20 → 40–45 FPS jump, sustained 60 FPS in Kokiri Village on base M4, or a corresponding gain on base M3 in either target mode. This was a source and evidence review; no new game run was made.
 
 ## Which builds were measured
 

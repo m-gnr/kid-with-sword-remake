@@ -3,14 +3,16 @@
 ## Protocol
 
 1. Run on AC power and keep Game Mode, the refresh mode, Metal HUD state and background workload consistent. Record the executable hash, source commit or provenance, game build and chain version.
-2. Load a fresh copy of the same Kokiri Forest save for each launch. Set Normal, Docked, fullscreen and a 60 FPS target. Use a stationary camera at the same landmark and save reference screenshots. Record the 3D, game-output and drawable dimensions. Use a fixed separate route for visual correctness and scene-entry measurements.
+2. Load a fresh copy of the same Kokiri Forest save for each launch. Start with P0 (Normal + Handheld, 1280 × 720) and a 60 FPS target. If feasible, evaluate P1 (Normal + Docked) in a separate series with the same target. Keep presentation settings fixed within each series and do not use Potato settings. Use a stationary camera at the same landmark and save reference screenshots. Record the 3D, game-output and drawable dimensions. Use a fixed separate route to check visual quality, normal gameplay speed and scene-entry performance.
 3. Warm up for 30 seconds after reaching the scene and setting the camera. Record the following 60 seconds. Repeat three times for each setting, alternating baseline and candidate where possible. If the log still shows loading or pipeline compilation at the measurement boundary, record the failed run and repeat.
 4. Collect `DM_NVN_TSV`, host log timings and system swap I/O deltas. Compute presented FPS from presentation feedback over wall time. Use the reciprocal of the mean of the slowest 1% of presented intervals for the 1% low. Report frame-time p50, p95 and p99, CPU submission, footprint, Metal allocation and displayed/discarded counts. Record units and mark unavailable counters.
 5. Profile a separate series with `DM_NVN_GPUPROF`, use `dm/tools/gpuprof.py` to rank pass shapes and inspect GPU spans and gaps. Match hot passes to shader keys using pass dumps or an Xcode Metal capture. Use `DM_NVN_GPUPROF_CS=1` only for a separate compute diagnostic, since it changes execution ordering. Use a separate Metal System Trace for GPU idle and CPU/GPU waits. Keep these traces out of the ordinary A/B series.
 
-See [GPU profiling](../agents/05-debugging.md#gpu-time-on-the-device) and the [Mac benchmark harness](../development.md#a-benchmark-on-the-mac). Verify that a harness launch exercises the same fullscreen app settings before comparing its output with the working app.
+See [GPU profiling](../agents/05-debugging.md#gpu-time-on-the-device) and the [Mac benchmark harness](../development.md#a-benchmark-on-the-mac). Verify that a harness launch exercises the same console mode, resolution and presentation settings before comparing its output with the working app.
 
 ## Isolated Mac launch
+
+The launch example below records the settings used for the historical Normal + Docked fullscreen runs.
 
 Use an APFS scratch directory under the game's `0400486024DEC000-work/`. Close any other instance of the title. Clone the working app into a new app path using `cp -cRp` and snapshot the committed `save/`, optional `save_device/`, `pso_user.tsv` and `pso_archive/` into a private fixture. Copy the fixture into a new run directory on every launch. Avoid the live `save.work/`. Keep cloud saves disabled and leave the original app, saves and archives in place.
 

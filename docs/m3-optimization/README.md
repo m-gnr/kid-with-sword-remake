@@ -1,10 +1,15 @@
 # Ocarina of Time on Apple M3
 
-This branch tracks performance work for the Switch 2 release of The Legend of Zelda: Ocarina of Time (title ID `0400486024DEC000`). The target is stable 60 presented FPS, a 16.67 ms frame budget, with Docked mode, Normal resolution and fullscreen presentation while preserving visual quality and simulation speed.
+This branch tracks performance work for the Switch 2 release of The Legend of Zelda: Ocarina of Time (title ID `0400486024DEC000`) on base M3 (16 GB).
+
+- **P0 (Primary): Normal + Handheld (1280 × 720), targeting stable 60 presented FPS** (16.67 ms per frame).
+- **P1 (Secondary): Normal + Docked, targeting stable 60 presented FPS if feasible.**
+
+Preserve visual quality and normal gameplay speed in both modes. Do not use Potato settings.
 
 The test machine is a base Apple M3 MacBook Pro (Mac15,3), with 16 GiB of unified memory and macOS 26.6.2 (25G83). The captures used Xcode 27.2 (27B52). The optimization branch started at `e9c2f7e1f19a8c74e90283e892b8973173eabd61`. That is the source baseline. The exact identity of a measured app must be established separately.
 
-Phase One observed 21.62 FPS, a 46.25 ms frame interval, 36.29 ms of reported GPU time, 12.37 GB of application memory and 9.66 GB of Metal memory in Kokiri Forest. Game Mode was off. These are historical, uncontrolled measurements. The first base-M3 pass profile measured a 34.36–34.78 ms encoder span in the stationary view. Three ordinary runs per setting measured 20.52 presented FPS with dispatch overlap off and 20.87 with it on. Tagged GPU span p50 fell from 35.26 to 33.97 ms.
+The existing base M3 measurements used Normal + Docked. Phase One observed 21.62 FPS, a 46.25 ms frame interval, 36.29 ms of reported GPU time, 12.37 GB of application memory and 9.66 GB of Metal memory in Kokiri Forest. Game Mode was off. These are historical, uncontrolled measurements. The first base-M3 pass profile measured a 34.36–34.78 ms encoder span in the stationary view. Three ordinary runs per setting measured 20.52 presented FPS with dispatch overlap off and 20.87 with it on. Tagged GPU span p50 fell from 35.26 to 33.97 ms.
 
 ## Phase Two status
 
