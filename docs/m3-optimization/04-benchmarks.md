@@ -40,7 +40,7 @@ For a separate pass run, add `DM_NVN_GPUPROF=every:240` before the executable an
 
 | Date | Git commit | Hardware | Configuration / Game Mode | Scene and camera | Duration | Average FPS / 1% low | GPU / frame-time percentiles | Memory | Visual validation |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Phase One, exact date unavailable | `e9c2f7e1` source baseline, measured binary unverified | Base M3, 16 GiB, macOS 26.6.2 | Docked, Normal, fullscreen, 60 FPS target / Off | Kokiri Forest, camera unrecorded | Unavailable | 21.62 observed, presentation basis unverified / unavailable | 36.29 ms reported GPU, span unavailable. Historical p50/p95/p99 by window in [Baseline](01-baseline.md). | 12.37 GB app, 9.66 GB Metal; swap deltas unavailable | Playable scene reached; no matched image comparison. |
+| Phase One, exact date unavailable | `e9c2f7e1` source baseline, measured binary unverified | Base M3, 16 GiB, macOS 26.6.2 | Docked, Normal, fullscreen, 60 FPS target / Off | Kokiri Forest, camera unrecorded | Unavailable | 21.62 observed, presentation basis unverified / unavailable | 36.29 ms reported GPU, span unavailable. Historical p50/p95/p99 by window in [Baseline](01-baseline.md). | 12.37 GB app, 9.66 GB Metal. Swap deltas unavailable. | Playable scene reached. Matched image comparison unavailable. |
 
 These observations were uncontrolled. Keep raw logs, TSVs, traces and copied saves in the title's external work directory. Record only summaries and the local run ID in Git.
 
@@ -57,4 +57,36 @@ Both runs used the base M3, 16 GiB, macOS 26.6.2 and the verified host artifact 
 
 - `compute-1/log.txt` contains the separately serialized compute samples, a same-frame all-bindings pass dump and shader attribution in [Investigation](02-investigation.md#serialized-compute-and-same-frame-attribution).
 - `capture-1/captures/dm_20261107-191459_f3330.gputrace` is the Xcode Metal frame capture from the copied save. The host logged the start and stop, then exited cleanly after the trace write window. The package occupies 7.7 GiB on the external APFS volume. The capture path compiled pipelines through `MTLDevice` and took about 165 s to prewarm. Keep its timings separate. Per-draw analysis in Xcode is pending.
-- The first `Metal System Trace` attempt in `compute-1` reached the 10 s time limit but timed out during finalization. `xctrace export --toc` rejected its partial bundle with `Document Missing Template Error`. A retry is planned outside the last ordinary timing window.
+- The first `Metal System Trace` attempt in `compute-1` reached the 10 s time limit but timed out during finalization. `xctrace export --toc` rejected its partial bundle with `Document Missing Template Error`. The retry recorded an 8 s Metal System Trace after the last ordinary timing window and let finalization finish after the game exited. `overlap-4/metal.trace` is 218 MiB. Both the table of contents and the GPU intervals exported successfully.
+
+## Ordinary dispatch-overlap A/B
+
+2026-11-07, source baseline `e9c2f7e1`, cloned app host hash above. Base M3, 16 GiB, macOS 26.6.2, AC power, Game Mode off, Docked, Normal, fullscreen and a 60 FPS target. The same copied save loaded at the same stationary stepping-stone view. Every accepted run had 30 s of warmup and about 60 s of timing-only TSV output. The post-window pass dumps confirm 854 × 480 for the main 3D passes. The game output is 2560 × 1440 and the MetalFX presentation target is 3600 × 2025. The game-side MetalFX request fell back to native NDSR in both configurations.
+
+`base-*` sets `DM_NVN_DISPATCH_OVERLAP=0`. `overlap-*` sets it to 1. The first six runs alternated settings. `base-1` and `overlap-3` are retained below and excluded because start-boundary CPU samples showed `replayd` at 86.8% and the Codex renderer at 140.2%, respectively. The later runs replaced them. Workload samples are snapshots, and system swap and background work can vary within a window. The Mac host reported its thermal state as unavailable. The accepted windows had no focus events, missing presentation feedback, synchronous pipeline creations or reported re-uploads.
+
+| Run | Window (s) | Presented FPS / 1% low | Presented p50/p95/p99 (ms) | Host p50/p95/p99 (ms) | Tagged GPU span p50/p95/p99 (ms) | GPU sum / submit CPU p50 (ms) | Shown / discarded |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `base-2` | 60.026 | 20.52 / 13.33 | 50.00/50.00/75.00 | 49.85/51.55/52.99 | 35.23/37.99/40.85 | 35.06 / 9.91 | 1232 / 22 |
+| `base-3` | 60.209 | 20.56 / 13.33 | 50.00/50.00/75.00 | 49.86/51.73/53.85 | 35.26/37.91/40.69 | 35.05 / 9.88 | 1238 / 20 |
+| `base-4` | 60.130 | 20.42 / 12.00 | 50.00/50.00/75.00 | 49.80/51.85/53.72 | 35.41/38.47/39.99 | 35.03 / 8.54 | 1228 / 35 |
+| `overlap-1` | 60.045 | 20.75 / 14.31 | 50.00/50.00/66.67 | 49.86/51.63/52.67 | 34.07/36.21/37.45 | 33.66 / 8.78 | 1246 / 12 |
+| `overlap-2` | 60.331 | 21.07 / 14.18 | 50.00/54.17/66.67 | 49.74/51.55/52.76 | 33.97/36.79/39.05 | 33.65 / 9.21 | 1271 / 10 |
+| `overlap-4` | 60.221 | 20.87 / 14.86 | 50.00/50.00/66.67 | 49.78/51.80/53.38 | 33.84/36.67/41.00 | 33.48 / 9.67 | 1257 / 7 |
+| `base-1` (excluded) | 60.170 | 20.46 / 12.00 | 50.00/50.00/75.00 | 49.80/51.70/53.88 | 35.53/38.05/39.85 | 35.10 / 9.13 | 1231 / 30 |
+| `overlap-3` (excluded) | 60.007 | 20.98 / 13.93 | 50.00/50.00/66.67 | 49.81/51.67/52.58 | 33.87/36.16/37.80 | 33.35 / 9.44 | 1259 / 7 |
+
+| Run | Peak sampled footprint / Metal (MiB) | Swap in/out (16 KiB pages) | dHash bits / RGB16 distance from base-2 |
+| --- | ---: | ---: | ---: |
+| `base-2` | 10,584 / 7,166 | 17,655 / 31,424 | 0 / 0.00 |
+| `base-3` | 10,542 / 7,148 | 9,051 / 9,920 | 4 / 4.61 |
+| `base-4` | 10,530 / 7,102 | 31,149 / 46,424 | 7 / 6.84 |
+| `overlap-1` | 10,556 / 7,149 | 30,644 / 21,632 | 3 / 6.76 |
+| `overlap-2` | 10,531 / 7,131 | 48,161 / 66,140 | 3 / 6.65 |
+| `overlap-4` | 10,713 / 7,188 | 28,197 / 24,160 | 3 / 5.00 |
+| `base-1` (excluded) | 10,486 / 7,120 | 22,433 / 15,036 | 5 / 4.79 |
+| `overlap-3` (excluded) | 10,515 / 7,101 | 19,015 / 20,992 | 5 / 5.08 |
+
+The run medians were 20.52 → 20.87 presented FPS (+0.35, 1.7%), 13.33 → 14.31 FPS for the 1% low and 35.26 → 33.97 ms for tagged GPU span p50 (−1.29 ms, 3.7%). GPU span p95 went from 37.99 to 36.67 ms, and host frame p50 from 49.85 to 49.78 ms. Median discarded counts were 22 → 10. Median on-screen interval stayed at 50.00 ms, consistent with the game's three-refresh holds. Tagged GPU span comes from the first and last timestamps of host-tagged command buffers. It differs from both summed GPU duration and the display interval.
+
+The screenshots match in camera, terrain, depth appearance and HUD on visual spot check. The accepted overlap screenshots were 3 dHash bits and at most 6.76 RGB16 units from `base-2`, within the variation of the baseline screenshots. This checks the stationary view. Moving foliage, transitions and simulation speed along a gameplay route still need validation before adopting the toggle as a default.

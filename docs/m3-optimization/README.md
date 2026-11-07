@@ -2,19 +2,20 @@
 
 This branch tracks performance work for the Switch 2 release of The Legend of Zelda: Ocarina of Time (title ID `0400486024DEC000`). The target is stable 60 presented FPS, a 16.67 ms frame budget, with Docked mode, Normal resolution and fullscreen presentation while preserving visual quality and simulation speed.
 
-The test machine is a base Apple M3 MacBook Pro (Mac15,3), with 16 GiB of unified memory and macOS 26.6.2 (25G83). The optimization branch started at `e9c2f7e1f19a8c74e90283e892b8973173eabd61`. That is the source baseline. The exact identity of a measured app must be established separately.
+The test machine is a base Apple M3 MacBook Pro (Mac15,3), with 16 GiB of unified memory and macOS 26.6.2 (25G83). The captures used Xcode 27.2 (27B52). The optimization branch started at `e9c2f7e1f19a8c74e90283e892b8973173eabd61`. That is the source baseline. The exact identity of a measured app must be established separately.
 
-Phase One observed 21.62 FPS, a 46.25 ms frame interval, 36.29 ms of reported GPU time, 12.37 GB of application memory and 9.66 GB of Metal memory in Kokiri Forest. Game Mode was off. These are historical, uncontrolled measurements. The first base-M3 pass profile measured a 34.36–34.78 ms encoder span in the stationary view. The ordinary three-run comparison is in progress.
+Phase One observed 21.62 FPS, a 46.25 ms frame interval, 36.29 ms of reported GPU time, 12.37 GB of application memory and 9.66 GB of Metal memory in Kokiri Forest. Game Mode was off. These are historical, uncontrolled measurements. The first base-M3 pass profile measured a 34.36–34.78 ms encoder span in the stationary view. Three ordinary runs per setting measured 20.52 presented FPS with dispatch overlap off and 20.87 with it on. Tagged GPU span p50 fell from 35.26 to 33.97 ms.
 
-## Phase Two progress
+## Phase Two status
 
 - [x] Verify the fork and publish the baseline optimization branch.
 - [x] Preserve the Phase One measurements and the five investigation areas.
 - [x] Verify an isolated launch with a copied Kokiri Forest save and fixed camera.
 - [x] Collect and rank a separate base-M3 per-pass profile.
-- [x] Attribute the NDSR compute workload and save an Xcode Metal frame capture.
-- [ ] Complete three ordinary baselines and three dispatch-overlap runs.
-- [ ] Rank candidate changes from base-M3 evidence and select the first implementation.
+- [x] Attribute the NDSR compute workload and save an Xcode Metal frame capture and Instruments trace.
+- [x] Complete three accepted ordinary baselines and three accepted dispatch-overlap runs.
+- [x] Rank candidates and select dispatch overlap for wider route validation.
+- [ ] Attribute the hottest render pass by draw in Xcode.
 - [x] Identify the native-store backport and verify the local shader.
 - [ ] Obtain approval before substantial renderer changes or a full game rebuild.
 
