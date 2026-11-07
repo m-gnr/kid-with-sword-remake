@@ -30,7 +30,7 @@ env -i PATH=/usr/bin:/bin HOME="$run/home" TMPDIR="$run/tmp" LANG=en_US.UTF-8 \
   "$app/Contents/MacOS/dmhost" "$res/dm" >"$run/log.txt" 2>&1
 ```
 
-At the title, use A to open the Load list, A to select the top Kokiri Forest save, and A to confirm Load. Leave the character and camera at the spawn point, facing the stepping stones with the sunlit forest and wooden structure ahead. Use `DM_CTL` for screenshots outside the timing window. Keep the game foreground during capture and reject runs with covered or paused windows. The clone's `LSSupportsGameMode` is false. Record the active display mode and the workload at the timing boundary.
+At the title, press A to advance to the Load list, A to select the top Kokiri Forest save, and A to confirm Load. In the local script, three frame-indexed presses are followed by one conditional A only if the menu remains active. Visual verification of the scene is required after each run. Leave the character and camera at the spawn point, facing the stepping stones with the sunlit forest and wooden structure ahead. Use `DM_CTL` for screenshots outside the timing window. Keep the game foreground during capture and reject runs with covered or paused windows. The clone's `LSSupportsGameMode` is false. Record the active display mode and the workload at the timing boundary.
 
 Read `@pres_at_ms` for actual present times. Count distinct timestamps inside the fixed 60 s window. Take intervals between successive observed presentations, including gaps left by discarded frames. Count discarded frames separately using `@presented_ms=-1` and report missing feedback separately. Use `@frame_ms` for host percentiles, `@sub_cpu_ms` for CPU submission, and `@gpu_end_ms - @gpu_beg_ms` where available for the host's command-buffer span. Report `@gpu_ms` separately as summed duration. Leave a few seconds after the measurement window for delayed GPU and presentation feedback. Snapshot `vm_stat` and `sysctl vm.swapusage` on both boundaries. Use the host's memory windows for physical footprint and GPU allocation.
 
@@ -45,3 +45,10 @@ For a separate pass run, add `DM_NVN_GPUPROF=every:240` before the executable an
 These observations were uncontrolled. Keep raw logs, TSVs, traces and copied saves in the title's external work directory. Record only summaries and the local run ID in Git.
 
 Phase Two calibration used game version v131072, chain `dc815e0f38ca`, input stamp `60600e433778`, and app host SHA-256 `1b5940ad1a5ea09f369e172c56b695b583e6804ba696e5d3460bbe0bf11cbdfa`. This records the artifact used for local runs. The checkout's baseline commit identifies the source context and does not prove a byte-reproducible build. Run files are local to `0400486024DEC000-work/m3-phase-two.se3HhL/`.
+
+| Run | Date / commit context | Duration | Actual presented FPS / 1% low | Host frame p50/p95/p99 | Tagged GPU span p50/p95/p99 | Memory and validation |
+| --- | --- | ---: | ---: | --- | --- | --- |
+| `direct-calibration` | 2026-11-07 / `e9c2f7e1` source baseline | 60.209 s | 18.70 / 2.01 | 49.76/51.77/56.92 ms | 36.86/39.70/50.80 ms | 10,545 MiB footprint, 7,102 MiB Metal sampled peaks. Verified forest view. Focus loss inside the measurement window invalidated the timing pilot. |
+| `profile-2` | 2026-11-07 / `e9c2f7e1` source baseline | 45.019 s | 20.32 / 12.90 | 49.90/51.63/52.77 ms | 35.31/37.94/41.89 ms | 10,507 MiB footprint, 7,182 MiB Metal sampled peaks. 915 distinct presents, 22 discarded, swap-in/out deltas 9,107/12,196 system pages. Stationary forest view. Diagnostic instrumentation excludes this run from ordinary A/B. |
+
+Both runs used the base M3, 16 GiB, macOS 26.6.2 and the verified host artifact above. Settings were Docked, Normal, fullscreen, 60 FPS target, Game Mode off and dispatch overlap off. `profile-1` stopped in the title after the local reader encountered a partial TSV line. The retry ignored incomplete lines and used a manual confirm in the same copied save.

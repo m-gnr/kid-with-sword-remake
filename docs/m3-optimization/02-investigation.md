@@ -2,7 +2,7 @@
 
 The rewritten game runs on the host in `dm/host/`. NVN2 graphics commands are recorded and replayed onto Metal in [nvn_mtl.m](../../dm/gfx/nvn/nvn_mtl.m). The [shader build](../../dm/gfx/tools/dmsh_build.py) translates guest programs through SPIR-V and SPIRV-Cross to Metal libraries. [dmsh_meshstage.py](../../dm/gfx/tools/dmsh_meshstage.py) wraps task and mesh kernels for Metal. The game runs its own NDSR scaling before the host presents a drawable, which may introduce a second scaling stage.
 
-The order below is the Phase One investigation order. Base-M3 pass durations are unavailable.
+The order below is the Phase One investigation order. The [base-M3 GPU profile](#base-m3-encoder-profile) ranks the work in the stationary scene.
 
 ## A. Foliage mesh shader
 
@@ -27,3 +27,17 @@ The high footprint and the scene-entry upload are observations. Steady-state re-
 ## E. Frame pacing and presentation
 
 Trace `fstep_tick` in [hle_nvn.c](../../dm/gfx/nvn/hle_nvn.c) and `link_sync`, `present_enqueue` and `present_now` in `nvn_mtl.m`. The historical log shows failed adaptive probes from three vsyncs back to one. A matched trace can separate GPU completion from acquire waits, display-link gaps and actual presentation. A simulation-rate fix would need to preserve real-time gameplay through refresh and frame-step changes. Compare presented timestamps with host submission rates and run a timed gameplay check before attributing any gain to pacing.
+
+## Base-M3 encoder profile
+
+`profile-2` used the same copied save and stationary view, with sparse encoder timestamps and a separate nearby pass dump. The 45.019 s diagnostic window covers frames 5485–6421. Four profiles in that window (5520, 5760, 6000 and 6240) had 34.36–34.78 ms between their first and last encoder. The gaps between instrumented encoder intervals were 1.38–1.65 ms. Those gaps do not identify GPU idle outside the profiled queue or prove a barrier dependency.
+
+| Ranked workload | Base-M3 result | Attribution |
+| --- | --- | --- |
+| 854 × 480 color plus depth passes | 20.19 ms mean summed per frame across 16 passes. The longest individual pass was 17.03–17.70 ms and had 1,059–1,077 draws. | The nearby pass dump includes foliage programs, including mesh key `e6df2f14035e7be7` and foliage fragments from the same BNSH program as `626fbf48041cb82b`. It does not name that mesh key or time a specific draw. The whole-pass cost does not estimate the byte-store savings. |
+| Compute and copy encoders | 9.48 ms mean summed per frame. The leading 115-dispatch batch took 5.53–5.71 ms. The late four-dispatch batch took 3.51–3.95 ms. | The nearby dump starts with foliage compute and shows four consecutive NDSR stages near the end. Per-dispatch attribution requires the separate serialized diagnostic. |
+| Remaining rendering | About 3.36 ms mean summed per frame. The 128 × 128 color/depth group averaged 0.63 ms, and 1600 × 1600 depth-only passes averaged 0.54 ms. | Timing groups come from pass shape and attachment format. |
+
+The game rendered the main 3D passes at 854 × 480, produced 2560 × 1440 and presented through MetalFX to 3600 × 2025. `DM_NVN_UPDUMP` reproduced the unrecognized `d99fbeeb53d38847` stage at 854 × 480 → 2560 × 1440. The fallback left the game NDSR chain active in the sampled frames. The host separately reported 2.48 ms p50 and 3.09 ms p95 on the last 600 presentation MetalFX command buffers. These timings can overlap with game rendering.
+
+The diagnostic window recorded zero re-uploads and zero synchronous pipeline creations. Sampled peaks were 10,507 MiB physical footprint and 7,182 MiB Metal allocation. System swap continued to move. Those counters constrain the investigation for this view. A separate matched scene-transition run is needed to assess upload and release behavior.

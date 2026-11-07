@@ -4,14 +4,15 @@ This branch tracks performance work for the Switch 2 release of The Legend of Ze
 
 The test machine is a base Apple M3 MacBook Pro (Mac15,3), with 16 GiB of unified memory and macOS 26.6.2 (25G83). The optimization branch started at `e9c2f7e1f19a8c74e90283e892b8973173eabd61`. That is the source baseline. The exact identity of a measured app must be established separately.
 
-Phase One observed 21.62 FPS, a 46.25 ms frame interval, 36.29 ms of reported GPU time, 12.37 GB of application memory and 9.66 GB of Metal memory in Kokiri Forest. Game Mode was off. These are historical, uncontrolled measurements. A controlled M3 comparison and a pass-level GPU ranking are pending.
+Phase One observed 21.62 FPS, a 46.25 ms frame interval, 36.29 ms of reported GPU time, 12.37 GB of application memory and 9.66 GB of Metal memory in Kokiri Forest. Game Mode was off. These are historical, uncontrolled measurements. The first base-M3 pass profile measured a 34.36–34.78 ms encoder span in the stationary view. The ordinary three-run comparison is in progress.
 
 ## Phase Two progress
 
 - [x] Verify the fork and publish the baseline optimization branch.
 - [x] Preserve the Phase One measurements and the five investigation areas.
 - [x] Verify an isolated launch with a copied Kokiri Forest save and fixed camera.
-- [ ] Collect three ordinary baselines and a separate per-pass profile.
+- [x] Collect and rank a separate base-M3 per-pass profile.
+- [ ] Complete three ordinary baselines and three dispatch-overlap runs.
 - [ ] Rank candidate changes from base-M3 evidence and select the first implementation.
 - [x] Identify the native-store backport and verify the local shader.
 - [ ] Obtain approval before substantial renderer changes or a full game rebuild.
