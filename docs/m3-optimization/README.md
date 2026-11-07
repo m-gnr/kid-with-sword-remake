@@ -10,9 +10,10 @@ Phase One observed 21.62 FPS, a 46.25 ms frame interval, 36.29 ms of reported GP
 
 - [x] Verify the fork and publish the baseline optimization branch.
 - [x] Preserve the Phase One measurements and the five investigation areas.
-- [ ] Verify an isolated launch with a copied Kokiri Forest save and fixed camera.
+- [x] Verify an isolated launch with a copied Kokiri Forest save and fixed camera.
 - [ ] Collect three ordinary baselines and a separate per-pass profile.
 - [ ] Rank candidate changes from base-M3 evidence and select the first implementation.
+- [x] Identify the native-store backport and verify the local shader.
 - [ ] Obtain approval before substantial renderer changes or a full game rebuild.
 
 ## Technical record
